@@ -2,7 +2,11 @@ package pramonow.com.android_graphql
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import com.apollographql.apollo.ApolloCall
 import com.apollographql.apollo.ApolloClient
+import com.apollographql.apollo.api.Response
+import com.apollographql.apollo.exception.ApolloException
 import okhttp3.OkHttpClient
 
 class MainActivity : AppCompatActivity() {
@@ -15,12 +19,12 @@ class MainActivity : AppCompatActivity() {
                     val builder = original.newBuilder().method(original.method(),
                             original.body())
                     builder.addHeader("Authorization"
-                            , "Bearer " + BuildConfig.AUTH_TOKEN)
+                            , "Bearer " + "92139db05538f5c3c2702490c4c9a8f3a028e6c1")
                     chain.proceed(builder.build())
                 })
                 .build()
         return ApolloClient.builder()
-                .serverUrl(BASE_URL)
+                .serverUrl("https://api.github.com/graphql")
                 .okHttpClient(okHttp)
                 .build()
     }
@@ -33,26 +37,15 @@ class MainActivity : AppCompatActivity() {
         var client = setupApollo()
         client.query(FindQuery    //From the auto generated class
                 .builder()
-                .name(repo_name_edittext.text.toString()) //Passing required arguments
-                .owner(owner_name_edittext.text.toString()) //Passing required arguments
+                .name("androidbasic") //Passing required arguments
+                .owner("pramonow") //Passing required arguments
                 .build())
                 .enqueue(object : ApolloCall.Callback<FindQuery.Data>() {
                     override fun onFailure(e: ApolloException) {
-                        Log.info(e.message.toString())
+                        Log.d("baniman", "" + e.message)
                     }
                     override fun onResponse(response: Response<FindQuery.Data>) {
-                        Log.info(" " + response.data()?.repository())
-                        runOnUiThread({
-                            progress_bar.visibility = View.GONE
-                            name_text_view.text = String.format(getString(R.string.name_text),
-                                    response.data()?.repository()?.name())
-                            description_text_view.text = String.format(getString(R.string.description_text),
-                                    response.data()?.repository()?.description())
-                            forks_text_view.text = String.format(getString(R.string.fork_count_text),
-                                    response.data()?.repository()?.forkCount().toString())
-                            url_text_view.text = String.format(getString(R.string.url_count_text),
-                                    response.data()?.repository()?.url().toString())
-                        })
+                        Log.d("baniman", "" + response.data().toString())
                     }
                 })
     }
