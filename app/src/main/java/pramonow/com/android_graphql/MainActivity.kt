@@ -23,6 +23,7 @@ class MainActivity : AppCompatActivity() {
                     chain.proceed(builder.build())
                 })
                 .build()
+
         return ApolloClient.builder()
                 .serverUrl("https://api.github.com/graphql")
                 .okHttpClient(okHttp)
@@ -33,9 +34,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-
         var client = setupApollo()
-        client.query(FindQuery    //From the auto generated class
+
+        /*client.query(FindQuery    //From the auto generated class
                 .builder()
                 .name("androidbasic") //Passing required arguments
                 .owner("pramonow") //Passing required arguments
@@ -47,6 +48,31 @@ class MainActivity : AppCompatActivity() {
                     override fun onResponse(response: Response<FindQuery.Data>) {
                         Log.d("baniman", "" + response.data().toString())
                     }
-                })
+                })*/
+
+        client.query(FindUser    //From the auto generated class
+                .builder()
+                .login("pramonow") //Passing required arguments
+                .build())
+        .enqueue(object : ApolloCall.Callback<FindUser.Data>() {
+            override fun onFailure(e: ApolloException) {
+                Log.d("baniman", "" + e.message)
+            }
+            override fun onResponse(response: Response<FindUser.Data>) {
+                Log.d("baniman", "" + response.data().toString())
+            }
+        })
+
+        /*client.query(TestThingy    //From the auto generated class
+                .builder()
+                .build())
+                .enqueue(object : ApolloCall.Callback<TestThingy.Data>() {
+                    override fun onFailure(e: ApolloException) {
+                        Log.d("baniman", "" + e.message)
+                    }
+                    override fun onResponse(response: Response<TestThingy.Data>) {
+                        Log.d("baniman", "" + response.data().toString())
+                    }
+                })*/
     }
 }

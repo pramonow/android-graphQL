@@ -6,3 +6,42 @@ query FindQuery($owner:String!,$name:String!){
     url
   }
 }
+
+query FindUser($login:String!){
+  user(login:$login) {
+    name
+    repositories(first:5) {
+        edges{
+            node{
+                name
+                primaryLanguage {
+                    id
+                    name
+                    color
+                }
+            }
+        }
+    }
+  }
+}
+
+query TestThingy{
+  repository(owner:"octocat", name:"Hello-World") {
+    name
+    issues(first:20) {
+      edges{
+        node {
+          title
+          url
+          labels(first:5) {
+            edges {
+              node {
+                name
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
