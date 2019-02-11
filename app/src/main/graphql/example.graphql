@@ -10,7 +10,7 @@ query FindQuery($owner:String!,$name:String!){
 query FindUser($login:String!){
   user(login:$login) {
     name
-    repositories(first:5) {
+    repositories(first:10) {
         edges{
             node{
                 name
@@ -21,27 +21,6 @@ query FindUser($login:String!){
                 }
             }
         }
-    }
-  }
-}
-
-query TestThingy{
-  repository(owner:"octocat", name:"Hello-World") {
-    name
-    issues(first:20) {
-      edges{
-        node {
-          title
-          url
-          labels(first:5) {
-            edges {
-              node {
-                name
-              }
-            }
-          }
-        }
-      }
     }
   }
 }

@@ -11,23 +11,22 @@ import okhttp3.OkHttpClient
 
 class MainActivity : AppCompatActivity() {
 
+    //setting up http client and apollo client here
     private fun setupApollo(): ApolloClient {
-        val okHttp = OkHttpClient
-                .Builder()
-                .addInterceptor({ chain ->
-                    val original = chain.request()
-                    val builder = original.newBuilder().method(original.method(),
-                            original.body())
-                    builder.addHeader("Authorization"
-                            , "Bearer " + "92139db05538f5c3c2702490c4c9a8f3a028e6c1")
-                    chain.proceed(builder.build())
-                })
-                .build()
 
-        return ApolloClient.builder()
-                .serverUrl("https://api.github.com/graphql")
-                .okHttpClient(okHttp)
-                .build()
+        //generate git authentication token from your github (Developer option)
+        val gitToken = "REPLACE_WITH_TOKEN"
+
+        //generate http client with git token
+        val okHttp = OkHttpClient.Builder().addInterceptor { chain ->
+                    val original = chain.request()
+                    val builder = original.newBuilder().method(original.method(), original.body())
+                    builder.addHeader("Authorization", "Bearer " + gitToken)
+
+                    chain.proceed(builder.build())
+                }.build()
+
+        return ApolloClient.builder().serverUrl("https://api.github.com/graphql").okHttpClient(okHttp).build()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,43 +35,28 @@ class MainActivity : AppCompatActivity() {
 
         var client = setupApollo()
 
-        /*client.query(FindQuery    //From the auto generated class
-                .builder()
-                .name("androidbasic") //Passing required arguments
-                .owner("pramonow") //Passing required arguments
-                .build())
-                .enqueue(object : ApolloCall.Callback<FindQuery.Data>() {
-                    override fun onFailure(e: ApolloException) {
-                        Log.d("baniman", "" + e.message)
-                    }
-                    override fun onResponse(response: Response<FindQuery.Data>) {
-                        Log.d("baniman", "" + response.data().toString())
-                    }
-                })*/
+        //generate queries
+        val findRepoQuery = FindQuery.builder().name("androidbasic").owner("pramonow").build()
+        val findUserQuery = FindUser.builder().login("pramonow").build()
 
-        client.query(FindUser    //From the auto generated class
-                .builder()
-                .login("pramonow") //Passing required arguments
-                .build())
-        .enqueue(object : ApolloCall.Callback<FindUser.Data>() {
-            override fun onFailure(e: ApolloException) {
-                Log.d("baniman", "" + e.message)
+        //simple basic query
+        client.query(findRepoQuery).enqueue(object : ApolloCall.Callback<FindQuery.Data>() {
+            override fun onResponse(response: Response<FindQuery.Data>) {
+                Log.d("GQLTAG", "Response: " + response.data().toString())
             }
-            override fun onResponse(response: Response<FindUser.Data>) {
-                Log.d("baniman", "" + response.data().toString())
+            override fun onFailure(e: ApolloException) {
+                Log.d("GQLTAG", "Error: " + e.message)
             }
         })
 
-        /*client.query(TestThingy    //From the auto generated class
-                .builder()
-                .build())
-                .enqueue(object : ApolloCall.Callback<TestThingy.Data>() {
-                    override fun onFailure(e: ApolloException) {
-                        Log.d("baniman", "" + e.message)
-                    }
-                    override fun onResponse(response: Response<TestThingy.Data>) {
-                        Log.d("baniman", "" + response.data().toString())
-                    }
-                })*/
+        //this query is example for using edges to get data that is connected to another table
+        client.query(findUserQuery).enqueue(object : ApolloCall.Callback<FindUser.Data>() {
+            override fun onResponse(response: Response<FindUser.Data>) {
+                Log.d("GQLTAG", "Response: " + response.data().toString())
+            }
+            override fun onFailure(e: ApolloException) {
+                Log.d("GQLTAG", "Error: "+ e.message)
+            }
+        })
     }
 }
